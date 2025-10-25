@@ -119,10 +119,8 @@ export default function Component() {
       <motion.button
         ref={toggleRef}
         onClick={handleToggle}
-        className={`relative flex h-12 w-24 items-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-          isDark 
-            ? 'bg-slate-800 focus:ring-amber-500' 
-            : 'bg-gray-200 focus:ring-blue-500'
+        className={`relative flex h-12 w-24 items-center rounded-full p-1 transition-colors focus:outline-none ${
+          isDark ? 'bg-slate-800' : 'bg-gray-200'
         }`}
         aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
         role="switch"
@@ -162,8 +160,8 @@ export default function Component() {
                   width: '10px',
                   height: '10px',
                   background: isDark
-                    ? 'radial-gradient(circle, rgba(251, 191, 36, 0.7) 0%, rgba(251, 191, 36, 0) 70%)'
-                    : 'radial-gradient(circle, rgba(59, 130, 246, 0.7) 0%, rgba(59, 130, 246, 0) 70%)',
+                    ? 'radial-gradient(circle, rgba(59, 130, 246, 0.7) 0%, rgba(59, 130, 246, 0) 70%)'
+                    : 'radial-gradient(circle, rgba(251, 191, 36, 0.7) 0%, rgba(251, 191, 36, 0) 70%)',
                   mixBlendMode: 'normal',
                 }}
                 initial={{ scale: 0, opacity: 0 }}
