@@ -16,6 +16,7 @@ export default function Component() {
   const [mounted, setMounted] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   
   // Track whether toggle is in checked (dark) or unchecked (light) position
   const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
@@ -25,10 +26,26 @@ export default function Component() {
     setMounted(true);
   }, []);
 
-  // Generate particles with different timing
+  // Detect user's motion preference for accessibility
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setPrefersReducedMotion(e.matches);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Generate particles with different timing (limited to 3 for performance)
   const generateParticles = () => {
+    // Skip particles if user prefers reduced motion
+    if (prefersReducedMotion) return;
+
     const newParticles: Particle[] = [];
-    const particleCount = 3; // Multiple layers
+    const particleCount = 3; // Maximum 3 layers for performance
 
     for (let i = 0; i < particleCount; i++) {
       newParticles.push({
@@ -65,6 +82,15 @@ export default function Component() {
 
   return (
     <div className="relative inline-block">
+      {/* 
+        Performance & Layout Stability:
+        - All animations use transform (GPU accelerated, no reflow)
+        - Fixed dimensions on all elements prevent layout shifts
+        - Particles use absolute positioning (removed from layout flow)
+        - willChange hints optimize compositor layers
+        - Limited to 3 particle layers maximum for performance
+      */}
+      
       {/* SVG Filter for Film Grain Texture */}
       <svg className="absolute w-0 h-0">
         <defs>
@@ -123,22 +149,29 @@ export default function Component() {
           <Moon size={18} className={isDark ? 'text-white' : 'text-gray-800'} />
         </div>
 
-        {/* Circular Thumb with Bouncy Spring Physics */}
+        {/* Circular Thumb with Bouncy Spring Physics or Instant Transition */}
         <motion.div
           className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full shadow-md overflow-hidden ${
             isDark ? 'bg-slate-900' : 'bg-white'
           }`}
+          style={{
+            willChange: 'transform', // GPU acceleration
+          }}
           animate={{
             x: isDark ? 48 : 0,
           }}
-          transition={{
-            type: 'spring',
-            stiffness: 300,
-            damping: 20,
-          }}
+          transition={
+            prefersReducedMotion
+              ? { duration: 0 } // Instant transition for reduced motion
+              : {
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 20,
+                }
+          }
         >
           {/* Particle Layer - expanding circles from center with film grain */}
-          {isAnimating && particles.map((particle) => (
+          {isAnimating && !prefersReducedMotion && particles.map((particle) => (
             <motion.div
               key={particle.id}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -152,6 +185,7 @@ export default function Component() {
                     ? 'radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0) 70%)'
                     : 'radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0) 70%)',
                   filter: `url(#grain-${isDark ? 'dark' : 'light'})`,
+                  willChange: 'transform, opacity', // GPU acceleration
                 }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 8, opacity: [0, 1, 0] }}
