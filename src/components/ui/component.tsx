@@ -119,9 +119,16 @@ export default function Component() {
       <motion.button
         ref={toggleRef}
         onClick={handleToggle}
-        className={`relative flex h-12 w-24 items-center rounded-full p-1 transition-colors focus:outline-none ${
-          isDark ? 'bg-slate-800' : 'bg-gray-200'
-        }`}
+        className="relative flex h-12 w-24 items-center rounded-full p-1 transition-all duration-300 focus:outline-none"
+        style={{
+          background: isDark
+            ? 'linear-gradient(145deg, #1e293b, #0f172a)'
+            : 'linear-gradient(145deg, #f1f5f9, #e2e8f0)',
+          boxShadow: isDark
+            ? 'inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(255, 255, 255, 0.05), 0 4px 15px rgba(0, 0, 0, 0.3)'
+            : 'inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.7), 0 4px 15px rgba(0, 0, 0, 0.1)',
+          border: isDark ? '1px solid rgba(71, 85, 105, 0.3)' : '1px solid rgba(203, 213, 225, 0.5)',
+        }}
         aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
         role="switch"
         aria-checked={isDark}
@@ -136,9 +143,18 @@ export default function Component() {
 
         {/* Circular Thumb with Bouncy Spring Physics */}
         <motion.div
-          className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full shadow-md overflow-hidden ${
-            isDark ? 'bg-slate-900' : 'bg-white'
-          }`}
+          className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full overflow-hidden"
+          style={{
+            background: isDark
+              ? 'linear-gradient(145deg, #475569, #334155)'
+              : 'linear-gradient(145deg, #ffffff, #f8fafc)',
+            boxShadow: isDark
+              ? 'inset 1px 1px 3px rgba(255, 255, 255, 0.1), inset -1px -1px 3px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)'
+              : 'inset 1px 1px 3px rgba(255, 255, 255, 0.8), inset -1px -1px 3px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+            border: isDark
+              ? '1px solid rgba(148, 163, 184, 0.2)'
+              : '1px solid rgba(226, 232, 240, 0.8)',
+          }}
           animate={{
             x: isDark ? 48 : 0,
           }}
@@ -160,14 +176,14 @@ export default function Component() {
                   width: '10px',
                   height: '10px',
                   background: isDark
-                    ? 'radial-gradient(circle, rgba(59, 130, 246, 0.7) 0%, rgba(59, 130, 246, 0) 70%)'
+                    ? 'radial-gradient(circle, rgba(147, 197, 253, 0.5) 0%, rgba(147, 197, 253, 0) 70%)'
                     : 'radial-gradient(circle, rgba(251, 191, 36, 0.7) 0%, rgba(251, 191, 36, 0) 70%)',
                   mixBlendMode: 'normal',
                 }}
                 initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 8, opacity: [0, 1, 0] }}
+                animate={{ scale: isDark ? 6 : 8, opacity: [0, 1, 0] }}
                 transition={{
-                  duration: particle.duration,
+                  duration: isDark ? 0.5 : particle.duration,
                   delay: particle.delay,
                   ease: 'easeOut',
                 }}
