@@ -65,6 +65,51 @@ export default function Component() {
 
   return (
     <div className="relative inline-block">
+      {/* SVG Filter for Film Grain Texture */}
+      <svg className="absolute w-0 h-0">
+        <defs>
+          {/* Light mode grain - subtle */}
+          <filter id="grain-light">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.9"
+              numOctaves="4"
+              result="noise"
+            />
+            <feColorMatrix
+              in="noise"
+              type="saturate"
+              values="0"
+              result="desaturatedNoise"
+            />
+            <feComponentTransfer in="desaturatedNoise" result="lightGrain">
+              <feFuncA type="linear" slope="0.3" />
+            </feComponentTransfer>
+            <feBlend in="SourceGraphic" in2="lightGrain" mode="overlay" />
+          </filter>
+          
+          {/* Dark mode grain - more visible */}
+          <filter id="grain-dark">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.9"
+              numOctaves="4"
+              result="noise"
+            />
+            <feColorMatrix
+              in="noise"
+              type="saturate"
+              values="0"
+              result="desaturatedNoise"
+            />
+            <feComponentTransfer in="desaturatedNoise" result="darkGrain">
+              <feFuncA type="linear" slope="0.5" />
+            </feComponentTransfer>
+            <feBlend in="SourceGraphic" in2="darkGrain" mode="overlay" />
+          </filter>
+        </defs>
+      </svg>
+
       {/* Pill-shaped track container */}
       <button
         onClick={handleToggle}
@@ -92,7 +137,7 @@ export default function Component() {
             damping: 20,
           }}
         >
-          {/* Particle Layer - expanding circles from center */}
+          {/* Particle Layer - expanding circles from center with film grain */}
           {isAnimating && particles.map((particle) => (
             <motion.div
               key={particle.id}
@@ -106,6 +151,7 @@ export default function Component() {
                   background: isDark
                     ? 'radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0) 70%)'
                     : 'radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0) 70%)',
+                  filter: `url(#grain-${isDark ? 'dark' : 'light'})`,
                 }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 8, opacity: [0, 1, 0] }}
