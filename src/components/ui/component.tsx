@@ -1,7 +1,7 @@
 'use client';
 
 import { Sun, Moon } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 
@@ -13,10 +13,14 @@ interface Particle {
 
 export default function Component() {
   const { theme, setTheme, resolvedTheme } = useTheme();
+  
+  // State Management
   const [mounted, setMounted] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  
+  // Ref to track toggle button DOM element
+  const toggleRef = useRef<HTMLButtonElement>(null);
   
   // Track whether toggle is in checked (dark) or unchecked (light) position
   const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
@@ -26,26 +30,10 @@ export default function Component() {
     setMounted(true);
   }, []);
 
-  // Detect user's motion preference for accessibility
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  // Generate particles with different timing (limited to 3 for performance)
+  // Generate particles with different timing
   const generateParticles = () => {
-    // Skip particles if user prefers reduced motion
-    if (prefersReducedMotion) return;
-
     const newParticles: Particle[] = [];
-    const particleCount = 3; // Maximum 3 layers for performance
+    const particleCount = 3; // Multiple layers
 
     for (let i = 0; i < particleCount; i++) {
       newParticles.push({
@@ -65,7 +53,7 @@ export default function Component() {
     }, 1000);
   };
 
-  // Toggle handler that switches between themes and triggers particles
+  // Toggle handler - switches theme and triggers particles
   const handleToggle = () => {
     generateParticles();
     setTheme(isDark ? 'light' : 'dark');
@@ -82,17 +70,8 @@ export default function Component() {
 
   return (
     <div className="relative inline-block">
-      {/* 
-        Performance & Layout Stability:
-        - All animations use transform (GPU accelerated, no reflow)
-        - Fixed dimensions on all elements prevent layout shifts
-        - Particles use absolute positioning (removed from layout flow)
-        - willChange hints optimize compositor layers
-        - Limited to 3 particle layers maximum for performance
-      */}
-      
-      {/* SVG Filter for Film Grain Texture */}
-      <svg className="absolute w-0 h-0">
+        {/* SVG Filter for Film Grain Texture */}
+        <svg className="absolute w-0 h-0">
         <defs>
           {/* Light mode grain - subtle */}
           <filter id="grain-light">
@@ -137,41 +116,42 @@ export default function Component() {
       </svg>
 
       {/* Pill-shaped track container */}
-      <button
+      <motion.button
+        ref={toggleRef}
         onClick={handleToggle}
-        className={`relative flex h-12 w-24 items-center rounded-full p-1 transition-colors ${
-          isDark ? 'bg-slate-800' : 'bg-gray-200'
+        className={`relative flex h-12 w-24 items-center rounded-full p-1 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+          isDark 
+            ? 'bg-slate-800 focus:ring-amber-500' 
+            : 'bg-gray-200 focus:ring-blue-500'
         }`}
+        aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+        role="switch"
+        aria-checked={isDark}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         {/* Background Icons */}
         <div className="absolute inset-0 flex items-center justify-between px-3">
-          <Sun size={18} className={isDark ? 'text-white' : 'text-gray-800'} />
-          <Moon size={18} className={isDark ? 'text-white' : 'text-gray-800'} />
+          <Sun size={18} className={isDark ? 'text-yellow-100' : 'text-amber-600'} />
+          <Moon size={18} className={isDark ? 'text-yellow-100' : 'text-slate-700'} />
         </div>
 
-        {/* Circular Thumb with Bouncy Spring Physics or Instant Transition */}
+        {/* Circular Thumb with Bouncy Spring Physics */}
         <motion.div
           className={`relative z-10 flex h-10 w-10 items-center justify-center rounded-full shadow-md overflow-hidden ${
             isDark ? 'bg-slate-900' : 'bg-white'
           }`}
-          style={{
-            willChange: 'transform', // GPU acceleration
-          }}
           animate={{
             x: isDark ? 48 : 0,
           }}
-          transition={
-            prefersReducedMotion
-              ? { duration: 0 } // Instant transition for reduced motion
-              : {
-                  type: 'spring',
-                  stiffness: 300,
-                  damping: 20,
-                }
-          }
+          transition={{
+            type: 'spring',
+            stiffness: 300, // Fast, responsive movement
+            damping: 20, // Bouncy feel with slight overshoot
+          }}
         >
-          {/* Particle Layer - expanding circles from center with film grain */}
-          {isAnimating && !prefersReducedMotion && particles.map((particle) => (
+          {/* Particle Layer - expanding circles from center with grainy texture */}
+          {isAnimating && particles.map((particle) => (
             <motion.div
               key={particle.id}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -182,10 +162,9 @@ export default function Component() {
                   width: '10px',
                   height: '10px',
                   background: isDark
-                    ? 'radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0) 70%)'
-                    : 'radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0) 70%)',
-                  filter: `url(#grain-${isDark ? 'dark' : 'light'})`,
-                  willChange: 'transform, opacity', // GPU acceleration
+                    ? 'radial-gradient(circle, rgba(251, 191, 36, 0.7) 0%, rgba(251, 191, 36, 0) 70%)'
+                    : 'radial-gradient(circle, rgba(59, 130, 246, 0.7) 0%, rgba(59, 130, 246, 0) 70%)',
+                  mixBlendMode: 'normal',
                 }}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 8, opacity: [0, 1, 0] }}
@@ -194,20 +173,29 @@ export default function Component() {
                   delay: particle.delay,
                   ease: 'easeOut',
                 }}
-              />
+              >
+                {/* Grainy texture overlay */}
+                <div 
+                  className="absolute inset-0 rounded-full opacity-40"
+                  style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                    mixBlendMode: 'overlay',
+                  }}
+                />
+              </motion.div>
             </motion.div>
           ))}
 
           {/* Icon */}
           <div className="relative z-10">
             {isDark ? (
-              <Moon size={20} className="text-white" />
+              <Moon size={20} className="text-yellow-200" />
             ) : (
-              <Sun size={20} className="text-gray-800" />
+              <Sun size={20} className="text-amber-500" />
             )}
           </div>
         </motion.div>
-      </button>
+      </motion.button>
     </div>
   );
 }
