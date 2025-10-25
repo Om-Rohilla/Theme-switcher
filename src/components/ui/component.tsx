@@ -1,15 +1,35 @@
 'use client';
 
 import { Sun, Moon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
 
 export default function Component() {
-  const [isDark, setIsDark] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  
+  // Track whether toggle is in checked (dark) or unchecked (light) position
+  const isDark = mounted && (theme === 'dark' || resolvedTheme === 'dark');
 
+  // Handle hydration - prevent mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Toggle handler that switches between themes
   const handleToggle = () => {
-    setIsDark(!isDark);
+    setTheme(isDark ? 'light' : 'dark');
   };
+
+  // Prevent hydration mismatch - show placeholder during SSR
+  if (!mounted) {
+    return (
+      <div className="relative inline-block">
+        <div className="relative flex h-12 w-24 items-center rounded-full bg-gray-200 p-1" />
+      </div>
+    );
+  }
 
   return (
     <div className="relative inline-block">
