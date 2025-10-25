@@ -122,19 +122,87 @@ export default function Component() {
         className="relative flex h-12 w-24 items-center rounded-full p-1 transition-all duration-300 focus:outline-none"
         style={{
           background: isDark
-            ? 'linear-gradient(145deg, #1e293b, #0f172a)'
-            : 'linear-gradient(145deg, #f1f5f9, #e2e8f0)',
+            ? 'radial-gradient(ellipse at top left, #1e293b 0%, #0f172a 40%, #020617 100%)'
+            : 'radial-gradient(ellipse at top left, #ffffff 0%, #f1f5f9 40%, #cbd5e1 100%)',
           boxShadow: isDark
-            ? 'inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(255, 255, 255, 0.05), 0 4px 15px rgba(0, 0, 0, 0.3)'
-            : 'inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.7), 0 4px 15px rgba(0, 0, 0, 0.1)',
-          border: isDark ? '1px solid rgba(71, 85, 105, 0.3)' : '1px solid rgba(203, 213, 225, 0.5)',
+            ? `
+              inset 5px 5px 12px rgba(0, 0, 0, 0.9),
+              inset -5px -5px 12px rgba(71, 85, 105, 0.4),
+              inset 8px 8px 16px rgba(0, 0, 0, 0.7),
+              inset -8px -8px 16px rgba(100, 116, 139, 0.2),
+              inset 0 2px 4px rgba(0, 0, 0, 1),
+              inset 0 -2px 4px rgba(71, 85, 105, 0.4),
+              inset 0 0 20px rgba(0, 0, 0, 0.6),
+              0 1px 1px rgba(255, 255, 255, 0.05),
+              0 2px 4px rgba(0, 0, 0, 0.4),
+              0 8px 16px rgba(0, 0, 0, 0.4),
+              0 16px 32px rgba(0, 0, 0, 0.3),
+              0 24px 48px rgba(0, 0, 0, 0.2)
+            `
+            : `
+              inset 5px 5px 12px rgba(148, 163, 184, 0.5),
+              inset -5px -5px 12px rgba(255, 255, 255, 1),
+              inset 8px 8px 16px rgba(100, 116, 139, 0.3),
+              inset -8px -8px 16px rgba(255, 255, 255, 0.9),
+              inset 0 2px 4px rgba(148, 163, 184, 0.4),
+              inset 0 -2px 4px rgba(255, 255, 255, 1),
+              inset 0 0 20px rgba(203, 213, 225, 0.3),
+              0 1px 2px rgba(255, 255, 255, 1),
+              0 2px 4px rgba(0, 0, 0, 0.1),
+              0 8px 16px rgba(0, 0, 0, 0.08),
+              0 16px 32px rgba(0, 0, 0, 0.06),
+              0 24px 48px rgba(0, 0, 0, 0.04)
+            `,
+          border: isDark 
+            ? '2px solid rgba(51, 65, 85, 0.6)' 
+            : '2px solid rgba(203, 213, 225, 0.6)',
+          position: 'relative',
         }}
         aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
         role="switch"
         aria-checked={isDark}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, boxShadow: isDark
+          ? '0 16px 48px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5)'
+          : '0 16px 48px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.12)'
+        }}
         whileTap={{ scale: 0.95 }}
       >
+        {/* Deep inner groove/rim effect */}
+        <div 
+          className="absolute inset-[3px] rounded-full pointer-events-none"
+          style={{
+            boxShadow: isDark
+              ? 'inset 0 2px 6px rgba(0, 0, 0, 0.9), inset 0 -1px 3px rgba(71, 85, 105, 0.3)'
+              : 'inset 0 2px 6px rgba(100, 116, 139, 0.4), inset 0 -1px 3px rgba(255, 255, 255, 0.8)',
+          }}
+        />
+        
+        {/* Multi-layer glossy overlay */}
+        <div 
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            background: isDark
+              ? `
+                radial-gradient(ellipse at top, rgba(71, 85, 105, 0.15) 0%, transparent 50%),
+                linear-gradient(to bottom, rgba(71, 85, 105, 0.2) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.3) 100%)
+              `
+              : `
+                radial-gradient(ellipse at top, rgba(255, 255, 255, 0.8) 0%, transparent 50%),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.7) 0%, transparent 30%, transparent 70%, rgba(148, 163, 184, 0.15) 100%)
+              `,
+            mixBlendMode: 'overlay',
+          }}
+        />
+        
+        {/* Ambient occlusion effect */}
+        <div 
+          className="absolute inset-0 rounded-full pointer-events-none"
+          style={{
+            boxShadow: isDark
+              ? 'inset 0 0 15px rgba(0, 0, 0, 0.5)'
+              : 'inset 0 0 15px rgba(148, 163, 184, 0.2)',
+          }}
+        />
         {/* Background Icons */}
         <div className="absolute inset-0 flex items-center justify-between px-3">
           <Sun size={18} className={isDark ? 'text-yellow-100' : 'text-amber-600'} />
@@ -146,14 +214,30 @@ export default function Component() {
           className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full overflow-hidden"
           style={{
             background: isDark
-              ? 'linear-gradient(145deg, #475569, #334155)'
-              : 'linear-gradient(145deg, #ffffff, #f8fafc)',
+              ? 'linear-gradient(145deg, #64748b 0%, #475569 50%, #334155 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #fefefe 50%, #f8fafc 100%)',
             boxShadow: isDark
-              ? 'inset 1px 1px 3px rgba(255, 255, 255, 0.1), inset -1px -1px 3px rgba(0, 0, 0, 0.5), 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3)'
-              : 'inset 1px 1px 3px rgba(255, 255, 255, 0.8), inset -1px -1px 3px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+              ? `
+                inset 2px 2px 4px rgba(100, 116, 139, 0.4),
+                inset -2px -2px 4px rgba(0, 0, 0, 0.8),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15),
+                0 1px 2px rgba(255, 255, 255, 0.1),
+                0 8px 32px rgba(0, 0, 0, 0.6),
+                0 4px 12px rgba(0, 0, 0, 0.5),
+                0 2px 4px rgba(0, 0, 0, 0.4)
+              `
+              : `
+                inset 2px 2px 4px rgba(203, 213, 225, 0.3),
+                inset -2px -2px 4px rgba(255, 255, 255, 1),
+                inset 0 1px 2px rgba(255, 255, 255, 1),
+                0 1px 2px rgba(255, 255, 255, 1),
+                0 8px 32px rgba(0, 0, 0, 0.18),
+                0 4px 12px rgba(0, 0, 0, 0.12),
+                0 2px 4px rgba(0, 0, 0, 0.08)
+              `,
             border: isDark
-              ? '1px solid rgba(148, 163, 184, 0.2)'
-              : '1px solid rgba(226, 232, 240, 0.8)',
+              ? '2px solid rgba(148, 163, 184, 0.3)'
+              : '2px solid rgba(255, 255, 255, 0.9)',
           }}
           animate={{
             x: isDark ? 48 : 0,
@@ -164,6 +248,14 @@ export default function Component() {
             damping: 20, // Bouncy feel with slight overshoot
           }}
         >
+          {/* Glossy shine overlay on thumb */}
+          <div 
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 0%, transparent 40%, rgba(0, 0, 0, 0.1) 100%)',
+              mixBlendMode: 'overlay',
+            }}
+          />
           {/* Particle Layer - expanding circles from center with grainy texture */}
           {isAnimating && particles.map((particle) => (
             <motion.div
