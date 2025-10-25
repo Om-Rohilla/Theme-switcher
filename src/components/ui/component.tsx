@@ -63,7 +63,7 @@ export default function Component() {
   if (!mounted) {
     return (
       <div className="relative inline-block">
-        <div className="relative flex h-12 w-24 items-center rounded-full bg-gray-200 p-1" />
+        <div className="relative flex h-[64px] w-[104px] items-center rounded-full bg-gray-200 p-1" />
       </div>
     );
   }
@@ -119,7 +119,7 @@ export default function Component() {
       <motion.button
         ref={toggleRef}
         onClick={handleToggle}
-        className="relative flex h-12 w-24 items-center rounded-full p-1 transition-all duration-300 focus:outline-none"
+        className="relative flex h-[64px] w-[104px] items-center rounded-full p-[6px] transition-all duration-300 focus:outline-none"
         style={{
           background: isDark
             ? 'radial-gradient(ellipse at top left, #1e293b 0%, #0f172a 40%, #020617 100%)'
@@ -161,11 +161,7 @@ export default function Component() {
         aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
         role="switch"
         aria-checked={isDark}
-        whileHover={{ scale: 1.05, boxShadow: isDark
-          ? '0 16px 48px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.5)'
-          : '0 16px 48px rgba(0, 0, 0, 0.18), 0 8px 24px rgba(0, 0, 0, 0.12)'
-        }}
-        whileTap={{ scale: 0.95 }}
+        whileTap={{ scale: 0.98 }}
       >
         {/* Deep inner groove/rim effect */}
         <div 
@@ -204,14 +200,14 @@ export default function Component() {
           }}
         />
         {/* Background Icons */}
-        <div className="absolute inset-0 flex items-center justify-between px-3">
-          <Sun size={18} className={isDark ? 'text-yellow-100' : 'text-amber-600'} />
-          <Moon size={18} className={isDark ? 'text-yellow-100' : 'text-slate-700'} />
+        <div className="absolute inset-0 flex items-center justify-between px-4">
+          <Sun size={20} className={isDark ? 'text-yellow-100' : 'text-amber-600'} />
+          <Moon size={20} className={isDark ? 'text-yellow-100' : 'text-slate-700'} />
         </div>
 
         {/* Circular Thumb with Bouncy Spring Physics */}
         <motion.div
-          className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full overflow-hidden"
+          className="relative z-10 flex h-[44px] w-[44px] items-center justify-center rounded-full overflow-hidden"
           style={{
             background: isDark
               ? 'linear-gradient(145deg, #64748b 0%, #475569 50%, #334155 100%)'
@@ -240,7 +236,7 @@ export default function Component() {
               : '2px solid rgba(255, 255, 255, 0.9)',
           }}
           animate={{
-            x: isDark ? 48 : 0,
+            x: isDark ? 46 : 0,
           }}
           transition={{
             type: 'spring',
